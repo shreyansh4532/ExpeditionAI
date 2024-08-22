@@ -4,6 +4,7 @@ import { db } from "@/service/firebaseConfig";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import InfoSection from "../components/InfoSection";
+import Hotels from "../components/Hotels";
 
 function ViewTrip() {
 
@@ -35,6 +36,7 @@ function ViewTrip() {
         <InfoSection trip={trip}/>
 
         {/* Recom. hotels */}
+        <Hotels trip={trip}/>
 
         {/* Itinerary / Daily plan */}
 
