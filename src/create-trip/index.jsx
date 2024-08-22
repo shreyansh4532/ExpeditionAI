@@ -73,15 +73,28 @@ function CreateTrip() {
   const login = useGoogleLogin({
     onSuccess: (res) => getUserProfile(res),
     onError: (err) => console.log(err),
-  })
+  });
 
   const getUserProfile = async (tokenInfo) => {
     try {
-      const res = await axios.get();
+      const res = await axios.get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo?.access_token}`,
+            Accept: "Application/json",
+          },
+        }
+      );
+      if(res.status === 200 && res.data) {
+        localStorage.setItem('user', res.data);
+        setOpenDialog(false);
+        handleGenerateTrip();
+      }
     } catch (error) {
-      console.log(error);      
+      console.log(error);
     }
-  }
+  };
 
   const handleGenerateTrip = async () => {
     const user = localStorage.getItem("user");
@@ -225,7 +238,10 @@ function CreateTrip() {
               <img src={logo} alt="" />
               <h2 className="font-bold text-lg mt-7">Sign In with Google</h2>
               <p>Sign In to the App securely with Google Authentication</p>
-              <Button className="w-full mt-5 flex gap-4 items-center" onClick={login}>
+              <Button
+                className="w-full mt-5 flex gap-4 items-center"
+                onClick={login}
+              >
                 <FcGoogle className="h-7 w-7" /> Sign In With Google
               </Button>
             </DialogDescription>
