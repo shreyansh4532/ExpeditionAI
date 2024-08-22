@@ -21,6 +21,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useGoogleLogin } from "@react-oauth/google";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/service/firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
 function CreateTrip() {
   // const [address, setAddress] = useState("");
@@ -30,6 +31,8 @@ function CreateTrip() {
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   // https://api.locationiq.com/v1/autocomplete?key=YOUR_ACCESS_TOKEN&q=SEARCH_STRING
   useEffect(() => {
@@ -153,6 +156,8 @@ function CreateTrip() {
       id: docID,  
     });
     setLoading(false);
+
+    navigate(`/view-trip/${docID}`);
   };
 
   return (
