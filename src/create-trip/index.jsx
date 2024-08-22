@@ -15,11 +15,12 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { FcGoogle } from "react-icons/fc";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useGoogleLogin } from "@react-oauth/google";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/service/firebaseConfig";
 
 function CreateTrip() {
   // const [address, setAddress] = useState("");
@@ -28,6 +29,7 @@ function CreateTrip() {
   const [placeSuggestion, setPlaceSuggestion] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // https://api.locationiq.com/v1/autocomplete?key=YOUR_ACCESS_TOKEN&q=SEARCH_STRING
   useEffect(() => {
@@ -86,8 +88,10 @@ function CreateTrip() {
           },
         }
       );
-      if(res.status === 200 && res.data) {
-        localStorage.setItem('user', res.data);
+      // console.log(res);
+      
+      if (res.status === 200 && res.data) {
+        localStorage.setItem("user", JSON.stringify(res.data));
         setOpenDialog(false);
         handleGenerateTrip();
       }
@@ -116,7 +120,7 @@ function CreateTrip() {
     }
 
     console.log(formData);
-
+    setLoading(true);
     // Replace prompt with appropriate values
     const FINAL_PROMPT = AI_PROMPT.replace("{location}", formData?.location)
       .replace("{totalDays}", formData?.noOfDays)
@@ -130,7 +134,25 @@ function CreateTrip() {
     // Pass the prompt to the AI model
     const result = await chatSession.sendMessage(FINAL_PROMPT);
 
-    console.log(result.response.text());
+    // console.log(result);
+    
+    console.log(result?.response?.text());
+    setLoading(false);
+    saveTripData(result?.response?.text());
+  };
+
+  const saveTripData = async (TripData) => {
+    setLoading(true);
+    const docID = Date.now().toString();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    await setDoc(doc(db, "AItrips", docID), {
+      userSelection: formData,
+      tripData : JSON.parse(TripData),
+      userEmail: user?.email,
+      id: docID,  
+    });
+    setLoading(false);
   };
 
   return (
@@ -228,7 +250,13 @@ function CreateTrip() {
         </div>
       </div>
       <div className="justify-end my-5 flex">
-        <Button onClick={handleGenerateTrip}>Generate Trip</Button>
+        <Button onClick={handleGenerateTrip} disable={loading}>
+          {loading ? (
+            <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
+          ) : (
+            "Generate Trip"
+          )}{" "}
+        </Button>
       </div>
 
       <Dialog open={openDialog}>
