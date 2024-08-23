@@ -141,7 +141,8 @@ function CreateTrip() {
     
     console.log(result?.response?.text());
     setLoading(false);
-    saveTripData(result?.response?.text());
+    // Stringifying it 'cause gemini generated data does not terminate string in some place.
+    saveTripData(JSON.stringify(result?.response?.text()));     
   };
 
   const saveTripData = async (TripData) => {
@@ -151,7 +152,7 @@ function CreateTrip() {
 
     await setDoc(doc(db, "AItrips", docID), {
       userSelection: formData,
-      tripData : JSON.parse(TripData),
+      tripData : JSON.parse(JSON.parse(TripData)),   // parse this twice.
       userEmail: user?.email,
       id: docID,  
     });

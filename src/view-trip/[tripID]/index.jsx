@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import InfoSection from "../components/InfoSection";
 import Hotels from "../components/Hotels";
+import Footer from "../components/Footer";
+import PlacesToVisit from "../components/PlacesToVisit";
 
 function ViewTrip() {
 
@@ -39,8 +41,10 @@ function ViewTrip() {
         <Hotels trip={trip}/>
 
         {/* Itinerary / Daily plan */}
+        <PlacesToVisit trip={trip}/>
 
         {/* Footer */}
+        <Footer />
     </div>
   )
 }
