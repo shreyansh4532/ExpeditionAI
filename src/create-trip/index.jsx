@@ -22,12 +22,14 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/service/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 function CreateTrip() {
   // const [address, setAddress] = useState("");
-  const [inputPlace, setInputPlace] = useState("");
-  const [selectedPlace, setSelectedPlace] = useState({});
-  const [placeSuggestion, setPlaceSuggestion] = useState([]);
+  const [place, setPlace] = useState();
+  // const [inputPlace, setInputPlace] = useState("");
+  // const [selectedPlace, setSelectedPlace] = useState({});
+  // const [placeSuggestion, setPlaceSuggestion] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [formData, setFormData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,36 +37,36 @@ function CreateTrip() {
   const navigate = useNavigate();
 
   // https://api.locationiq.com/v1/autocomplete?key=YOUR_ACCESS_TOKEN&q=SEARCH_STRING
-  useEffect(() => {
-    const handleInput = async () => {
-      try {
-        const res = await axios.get(
-          `https://api.locationiq.com/v1/autocomplete?key=${
-            import.meta.env.VITE_LOCIQ_API_KEY
-          }&q=${inputPlace}`
-        );
-        console.log(res);
-        if (res.status === 200) {
-          setPlaceSuggestion(res.data);
-        } else {
-          setPlaceSuggestion([]);
-        }
-        console.log("New array", placeSuggestion);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  // useEffect(() => {
+  //   const handleInput = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `https://api.locationiq.com/v1/autocomplete?key=${
+  //           import.meta.env.VITE_LOCIQ_API_KEY
+  //         }&q=${inputPlace}`
+  //       );
+  //       console.log(res);
+  //       if (res.status === 200) {
+  //         setPlaceSuggestion(res.data);
+  //       } else {
+  //         setPlaceSuggestion([]);
+  //       }
+  //       console.log("New array", placeSuggestion);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-    if (inputPlace !== selectedPlace.display_name) handleInput();
-  }, [inputPlace]);
+  //   if (inputPlace !== selectedPlace.display_name) handleInput();
+  // }, [inputPlace]);
 
-  const handleSuggestionClick = (place) => {
-    setSelectedPlace(place);
-    setInputPlace(place.display_name);
-    setPlaceSuggestion([]);
+  // const handleSuggestionClick = (place) => {
+  //   setSelectedPlace(place);
+  //   setInputPlace(place.display_name);
+  //   setPlaceSuggestion([]);
 
-    handleInputChange("location", place.display_name);
-  };
+  //   handleInputChange("location", place.display_name);
+  // };
 
   const handleInputChange = (name, value) => {
     setFormData({
@@ -92,7 +94,7 @@ function CreateTrip() {
         }
       );
       // console.log(res);
-      
+
       if (res.status === 200 && res.data) {
         localStorage.setItem("user", JSON.stringify(res.data));
         setOpenDialog(false);
@@ -138,11 +140,11 @@ function CreateTrip() {
     const result = await chatSession.sendMessage(FINAL_PROMPT);
 
     // console.log(result);
-    
+
     console.log(result?.response?.text());
     setLoading(false);
     // Stringifying it 'cause gemini generated data does not terminate string in some place.
-    saveTripData(JSON.stringify(result?.response?.text()));     
+    saveTripData(JSON.stringify(result?.response?.text()));
   };
 
   const saveTripData = async (TripData) => {
@@ -152,9 +154,9 @@ function CreateTrip() {
 
     await setDoc(doc(db, "AItrips", docID), {
       userSelection: formData,
-      tripData : JSON.parse(JSON.parse(TripData)),   // parse this twice.
+      tripData: JSON.parse(JSON.parse(TripData)), // parse this twice.
       userEmail: user?.email,
-      id: docID,  
+      id: docID,
     });
     setLoading(false);
 
@@ -175,7 +177,15 @@ function CreateTrip() {
         <div>
           <h2 className="text-xl font-medium my-3">Enter destination</h2>
 
-          <Input
+          <GooglePlacesAutocomplete
+            apiKey={import.meta.env.VITE_GOOGLE_CLOUD_API_KEY}
+            selectProps={{
+              place,
+              onChange: (v) => {setPlace(v); console.log(v.label); handleInputChange('location', v.label);}
+            }}
+          />
+
+          {/* <Input
             className="border-gray-700"
             type="text"
             name="address-1"
@@ -199,8 +209,8 @@ function CreateTrip() {
                 );
               })}
             </ul>
-          )}
-        </div>
+          )}*/}
+        </div> 
 
         <div>
           <h2 className="text-xl font-medium my-3">

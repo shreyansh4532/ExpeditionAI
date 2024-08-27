@@ -10,7 +10,7 @@ function PlacesToVisit({ trip }) {
           <div className="" key={index}>
             <h2 className="font-bold text-lg">Day {item.day}</h2>
 
-            <div className="grid grid-cols-2 mt-2 gap-5">
+            <div className="grid grid-cols-1 mt-2 gap-5 md:grid-cols-2">
               {item?.plan.map((p, i) => (
                 <PlaceCard key={i} placeInfo={p} />
               ))}
