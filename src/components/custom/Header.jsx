@@ -90,7 +90,7 @@ function Header() {
           <Button onClick={() => setOpenDialog(true)}>Sign in</Button>
         )}
       </div>
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>

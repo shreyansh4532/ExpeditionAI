@@ -1,7 +1,7 @@
 import logo from "../../public/logo.svg";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AI_PROMPT,
   SelectTravelBudget,
@@ -225,7 +225,7 @@ function CreateTrip() {
         </div>
 
         <div>
-          <h2 className="text-xl font-medium my-3">What's your budget?</h2>
+          <h2 className="text-xl font-medium my-3">{"What's"} your budget?</h2>
           <div className="grid grid-cols-3 gap-5 mt-5">
             {SelectTravelBudget.map((item, index) => (
               <div
@@ -275,7 +275,7 @@ function CreateTrip() {
         </Button>
       </div>
 
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>
